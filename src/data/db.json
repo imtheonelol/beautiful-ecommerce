@@ -1,0 +1,19 @@
+{
+  "products": [
+    { "id": 1, "name": "Luxury Watch", "price": 299.99, "category": "accessories", "image": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=600&q=80", "stock": 15 },
+    { "id": 2, "name": "Premium Leather Bag", "price": 149.99, "category": "bags", "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80", "stock": 8 },
+    { "id": 3, "name": "Designer Sunglasses", "price": 189.50, "category": "accessories", "image": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80", "stock": 20 },
+    { "id": 4, "name": "Silk Scarf", "price": 79.99, "category": "clothing", "image": "https://images.unsplash.com/photo-1584030373081-f37b7bb4faae?auto=format&fit=crop&w=600&q=80", "stock": 12 },
+    { "id": 5, "name": "Gold Necklace", "price": 499.00, "category": "jewelry", "image": "https://images.unsplash.com/photo-1599643478518-17488fbbcd75?auto=format&fit=crop&w=600&q=80", "stock": 5 },
+    { "id": 6, "name": "Running Shoes", "price": 129.99, "category": "footwear", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80", "stock": 25 }
+  ],
+  "orders": [
+    { "id": "ORD-001", "customer": "John Doe", "total": 449.98, "status": "processing", "date": "2024-05-10" },
+    { "id": "ORD-002", "customer": "Jane Smith", "total": 189.50, "status": "shipped", "date": "2024-05-09" },
+    { "id": "ORD-003", "customer": "Bob Johnson", "total": 79.99, "status": "delivered", "date": "2024-05-08" }
+  ],
+  "users": [
+    { "id": 1, "email": "admin@luxemart.com", "password": "admin123", "role": "admin", "name": "Admin User" },
+    { "id": 2, "email": "john@example.com", "password": "user123", "role": "customer", "name": "John Doe" }
+  ]
+}
