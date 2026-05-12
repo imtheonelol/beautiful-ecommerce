@@ -1,0 +1,14 @@
+{
+  "name": "luxemart-ecommerce",
+  "version": "1.0.0",
+  "description": "LUXEMART Premium E-commerce Platform with Layered Architecture",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["ecommerce", "luxury", "backoffice"],
+  "author": "imtheonelol",
+  "license": "MIT",
+  "dependencies": {}
+}
