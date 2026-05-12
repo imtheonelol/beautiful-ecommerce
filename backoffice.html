@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXEMART | Back Office</title>
+    <script type="module">
+        import API from './src/api/api.js';
+        
+        // Simple auth check
+        const user = API.getCurrentUser();
+        if (!user || user.role !== 'admin') {
+            window.location.href = 'index.html?login_required=true';
+        }
+
+        // Render Dashboard
+        async function initDashboard() {
+            const stats = await API.getOrderStats();
+            document.getElementById('revenue').textContent = `$${stats.totalRevenue.toFixed(2)}`;
+            document.getElementById('total-orders').textContent = stats.totalOrders;
+            document.getElementById('pending-orders').textContent = stats.pending;
+            
+            renderOrders(await API.fetchOrders());
+            renderProducts(await API.fetchProducts());
+        }
+
+        function renderOrders(orders) {
+            const tbody = document.querySelector('#orders-table tbody');
+            tbody.innerHTML = orders.map(o => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4 font-mono text-sm">${o.id}</td>
+                    <td class="p-4">${o.customer}</td>
+                    <td class="p-4">$${o.total}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold ${
+                            o.status === 'delivered' ? 'bg-green-100 text-green-700' : 
+                            o.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
+                        }">${o.status.toUpperCase()}</span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="updateStatus('${o.id}', 'shipped')" class="text-blue-600 hover:underline mr-2">Ship</button>
+                        <button onclick="updateStatus('${o.id}', 'delivered')" class="text-green-600 hover:underline">Complete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderProducts(products) {
+            const tbody = document.querySelector('#products-table tbody');
+            tbody.innerHTML = products.map(p => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="p-4"><img src="${p.image}" class="w-10 h-10 rounded object-cover"></td>
+                    <td class="p-4 font-medium">${p.name}</td>
+                    <td class="p-4">$${p.price}</td>
+                    <td class="p-4">${p.stock} units</td>
+                    <td class="p-4 text-right">
+                        <button class="text-red-600 hover:underline" onclick="alert('Edit feature coming soon')">Edit</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.updateStatus = async (id, status) => {
+            await API.updateOrderStatus(id, status);
+            initDashboard();
+        };
+
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Sidebar -->
+    <div class="flex">
+        <aside class="w-64 bg-slate-900 text-white min-h-screen fixed left-0 top-0 p-6">
+            <h1 class="text-2xl font-bold mb-8 tracking-wider">LUXEMART<span class="text-blue-400">.ADMIN</span></h1>
+            <nav class="space-y-4">
+                <a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg">Dashboard</a>
+                <a href="#" class="block py-2 px-4 hover:bg-slate-800 rounded-lg transition">Orders</a>
+                <a href="#" class="block py-2 px-4 hover:bg-slate-800 rounded-lg transition">Products</a>
+                <a href="#" class="block py-2 px-4 hover:bg-slate-800 rounded-lg transition">Customers</a>
+                <a href="index.html" class="block py-2 px-4 mt-8 text-red-400 hover:text-red-300">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 p-8">
+            <header class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800">Dashboard Overview</h2>
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-600">Welcome, Admin</span>
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">A</div>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Total Revenue</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2" id="revenue">$0.00</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Total Orders</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-2" id="total-orders">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Pending</p>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2" id="pending-orders">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-gray-500 text-sm">Shipped</p>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">0</p>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="font-bold text-lg">Recent Orders</h3>
+                </div>
+                <table class="w-full" id="orders-table">
+                    <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="p-4">Order ID</th>
+                            <th class="p-4">Customer</th>
+                            <th class="p-4">Total</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+
+            <!-- Products Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="font-bold text-lg">Product Inventory</h3>
+                </div>
+                <table class="w-full" id="products-table">
+                    <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="p-4">Image</th>
+                            <th class="p-4">Name</th>
+                            <th class="p-4">Price</th>
+                            <th class="p-4">Stock</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
